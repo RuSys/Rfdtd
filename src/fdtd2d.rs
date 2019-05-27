@@ -3,7 +3,6 @@
  * http://opensource.org/licenses/mit-license.php
  */
 
-
 use std::fs::File;
 use std::io::*;
 
@@ -12,8 +11,8 @@ const NX0: i32 = 120;
 const NY0: i32 = 120;
 
 // デフォルトセルサイズ
-const DX: f32 = 0.005;
-const DY: f32 = 0.005;
+const DX: f64 = 0.005;
+const DY: f64 = 0.005;
 
 // 計算ステップ総数
 #[allow(dead_code)]
@@ -22,7 +21,7 @@ pub const NSTEP: i32 = 2000;
 // pml次数, 層数, 要求精度
 const LPML: i32 = 8;
 const ORDER: i32 = 4;
-const RMAX: f32 = -120.0;// (dB)
+const RMAX: f64 = -120.0;// (dB)
 
 const NX: i32 = NX0 + 2 * LPML;
 const NY: i32 = NY0 + 2 * LPML;
@@ -33,20 +32,20 @@ const NY_P: usize = NY as usize;
 
 // 背景媒質
 #[allow(non_upper_case_globals)]
-const epsbk: f32 = 1.0;
+const epsbk: f64 = 1.0;
 #[allow(non_upper_case_globals)]
-const mubk: f32 = 1.0;
+const mubk: f64 = 1.0;
 #[allow(non_upper_case_globals)]
-const sigebk: f32 = 0.0;
+const sigebk: f64 = 0.0;
 #[allow(non_upper_case_globals)]
-const sigmbk: f32 = 0.0;
+const sigmbk: f64 = 0.0;
 #[allow(non_upper_case_globals)]
-const copml: f32 = -1.5280063e-4;
+const copml: f64 = -1.5280063e-4;
 
 // 定数
-const EPS0: f32 = 8.8541878e-12;
-const MU0: f32 = 1.2566371e-6;
-const C: f32 = 2.9979246e8;
+const EPS0: f64 = 8.8541878e-12;
+const MU0: f64 = 1.2566371e-6;
+const C: f64 = 2.9979246e8;
 
 // PML領域の位置格納構造体
 #[derive(Clone,Debug)]
@@ -61,74 +60,74 @@ struct pml {
 #[allow(non_camel_case_types)]
 pub struct fdtd {
     // 時間ステップサイズ, 時間
-    pub dt: f32,
+    pub dt: f64,
 
     // 電界配列
-    ex: Vec<Vec<f32>>,
-    ey: Vec<Vec<f32>>,
-    pub ez: Vec<Vec<f32>>,
+    ex: Vec<Vec<f64>>,
+    ey: Vec<Vec<f64>>,
+    pub ez: Vec<Vec<f64>>,
 
     // 磁界配列
-    pub hx: Vec<Vec<f32>>,
-    pub hy: Vec<Vec<f32>>,
-    hz: Vec<Vec<f32>>,
+    pub hx: Vec<Vec<f64>>,
+    pub hy: Vec<Vec<f64>>,
+    hz: Vec<Vec<f64>>,
 
     // 係数配列
-    aexpml: Vec<Vec<f32>>, // PML用
-    aeypml: Vec<Vec<f32>>, // PML用
+    aexpml: Vec<Vec<f64>>, // PML用
+    aeypml: Vec<Vec<f64>>, // PML用
 
-    aex: Vec<Vec<f32>>,
-    aey: Vec<Vec<f32>>,
-    aez: Vec<Vec<f32>>,
+    aex: Vec<Vec<f64>>,
+    aey: Vec<Vec<f64>>,
+    aez: Vec<Vec<f64>>,
 
-    bexpml: Vec<Vec<f32>>, // PML用
-    beypml: Vec<Vec<f32>>, // PML用
+    bexpml: Vec<Vec<f64>>, // PML用
+    beypml: Vec<Vec<f64>>, // PML用
 
-    bexy: Vec<Vec<f32>>,
-    beyx: Vec<Vec<f32>>,
-    bezx: Vec<Vec<f32>>,
-    bezy: Vec<Vec<f32>>,
+    bexy: Vec<Vec<f64>>,
+    beyx: Vec<Vec<f64>>,
+    bezx: Vec<Vec<f64>>,
+    bezy: Vec<Vec<f64>>,
 
-    amxpml: Vec<Vec<f32>>, // PML用
-    amypml: Vec<Vec<f32>>, // PML用
+    amxpml: Vec<Vec<f64>>, // PML用
+    amypml: Vec<Vec<f64>>, // PML用
 
-    amx: Vec<Vec<f32>>,
-    amy: Vec<Vec<f32>>,
-    amz: Vec<Vec<f32>>,
+    amx: Vec<Vec<f64>>,
+    amy: Vec<Vec<f64>>,
+    amz: Vec<Vec<f64>>,
 
-    bmxpml: Vec<Vec<f32>>, // PML用
-    bmypml: Vec<Vec<f32>>, // PML用
+    bmxpml: Vec<Vec<f64>>, // PML用
+    bmypml: Vec<Vec<f64>>, // PML用
 
-    bmxy: Vec<Vec<f32>>,
-    bmyx: Vec<Vec<f32>>,
-    bmzx: Vec<Vec<f32>>,
-    bmzy: Vec<Vec<f32>>,
+    bmxy: Vec<Vec<f64>>,
+    bmyx: Vec<Vec<f64>>,
+    bmzx: Vec<Vec<f64>>,
+    bmzy: Vec<Vec<f64>>,
 
-    expml: Vec<Vec<f32>>, // PML用
-    eypml: Vec<Vec<f32>>, // PML用
-    ezx: Vec<Vec<f32>>, // PML用
-    ezy: Vec<Vec<f32>>, // PML用
+    expml: Vec<Vec<f64>>, // PML用
+    eypml: Vec<Vec<f64>>, // PML用
+    ezx: Vec<Vec<f64>>, // PML用
+    ezy: Vec<Vec<f64>>, // PML用
 
-    hxpml: Vec<Vec<f32>>, // PML用
-    hypml: Vec<Vec<f32>>, // PML用
-    hzx: Vec<Vec<f32>>, // PML用
-    hzy: Vec<Vec<f32>>, // PML用
+    hxpml: Vec<Vec<f64>>, // PML用
+    hypml: Vec<Vec<f64>>, // PML用
+    hzx: Vec<Vec<f64>>, // PML用
+    hzy: Vec<Vec<f64>>, // PML用
 
     // 比誘電率, 導電率
-    epsd: Vec<Vec<f32>>,
-    sgmed: Vec<Vec<f32>>,
+    epsd: Vec<Vec<f64>>,
+    sgmed: Vec<Vec<f64>>,
 
     // 比透磁率, 磁気伝導率
-    mud: Vec<Vec<f32>>,
-    sgmmd : Vec<Vec<f32>>,
+    mud: Vec<Vec<f64>>,
+    sgmmd : Vec<Vec<f64>>,
 
     // PML領域
     pml_s: Vec<pml>,
 
     // 給電係数
-    befed: f32,
-    duration: f32,
-    t0: f32,
+    befed: f64,
+    duration: f64,
+    t0: f64,
 
     // セルサイズ設定
     nx: i32,
@@ -295,11 +294,11 @@ impl fdtd {
     fn initPml(&mut self, xs: i32, xl: i32, ys: i32, yl: i32) {
         self.pml_s.push(pml{x_s: xs, x_l: xl, y_s: ys, y_l: yl});
 
-        let smax0x = copml * RMAX * (ORDER + 1) as f32 / (LPML as f32 * DX);
-        let smax0y = copml * RMAX * (ORDER + 1) as f32 / (LPML as f32 * DY);
+        let smax0x = copml * RMAX * (ORDER + 1) as f64 / (LPML as f64 * DX);
+        let smax0y = copml * RMAX * (ORDER + 1) as f64 / (LPML as f64 * DY);
 
-        let epspml: f32 = epsbk * EPS0;
-        let mupml: f32 = mubk * MU0;
+        let epspml: f64 = epsbk * EPS0;
+        let mupml: f64 = mubk * MU0;
 
         for y in ys..yl {
             for x in xs..xl {
@@ -311,12 +310,12 @@ impl fdtd {
                 let mut a;
 
                 if x < LPML { // 左側のPML初期設定
-                    sigmxm = (((LPML - x) as f32 - 0.5) / (LPML as f32)).powi(ORDER) * smax0x;
-                    sigmxe = (((LPML - x) as f32) / (LPML as f32)).powi(ORDER) * smax0x;
+                    sigmxm = (((LPML - x) as f64 - 0.5) / (LPML as f64)).powi(ORDER) * smax0x;
+                    sigmxe = (((LPML - x) as f64) / (LPML as f64)).powi(ORDER) * smax0x;
                 }
                 else if x >= self.nx - LPML { // 右側のPML初期設定
-                    sigmxm = (((x - self.nx + LPML) as f32 + 0.5) / (LPML as f32)).powi(ORDER) * smax0x;
-                    sigmxe = (((x - self.nx + LPML) as f32) / (LPML as f32)).powi(ORDER) * smax0x;
+                    sigmxm = (((x - self.nx + LPML) as f64 + 0.5) / (LPML as f64)).powi(ORDER) * smax0x;
+                    sigmxe = (((x - self.nx + LPML) as f64) / (LPML as f64)).powi(ORDER) * smax0x;
                 }
                 else {
                     sigmxm = 0.0;
@@ -324,12 +323,12 @@ impl fdtd {
                 }
 
                 if y < LPML { // 上側のPML初期設定
-                    sigmym = (((LPML - y) as f32 - 0.5) / (LPML as f32)).powi(ORDER) * smax0y;
-                    sigmye = (((LPML - y) as f32) / (LPML as f32)).powi(ORDER) * smax0y;
+                    sigmym = (((LPML - y) as f64 - 0.5) / (LPML as f64)).powi(ORDER) * smax0y;
+                    sigmye = (((LPML - y) as f64) / (LPML as f64)).powi(ORDER) * smax0y;
                 }
                 else if y >= self.ny - LPML { // 下側のPML初期設定
-                    sigmym = (((y - self.ny + LPML) as f32 + 0.5) / (LPML as f32)).powi(ORDER) * smax0y;
-                    sigmye = (((y - self.ny + LPML) as f32) / (LPML as f32)).powi(ORDER) * smax0y;
+                    sigmym = (((y - self.ny + LPML) as f64 + 0.5) / (LPML as f64)).powi(ORDER) * smax0y;
+                    sigmye = (((y - self.ny + LPML) as f64) / (LPML as f64)).powi(ORDER) * smax0y;
                 }
                 else {
                     sigmym = 0.0;
@@ -438,7 +437,7 @@ impl fdtd {
     }
 
     // 障害物媒質設定 epsr: 障害物の誘電率
-    pub fn epsmu(&mut self, x_s: usize, x_l: usize, y_s: usize, y_l: usize, epsr: f32){
+    pub fn epsmu(&mut self, x_s: usize, x_l: usize, y_s: usize, y_l: usize, epsr: f64){
         for y in y_s+1..y_l {
             for x in x_s+1..x_l {
                 self.epsd[x][y] = epsr;
@@ -481,8 +480,8 @@ impl fdtd {
     }
 
     // 電流の計算
-    pub fn feed(&mut self, x: usize, y: usize, t: f32){
-        let mut tmp:f32 = (t - 0.5 * self.dt - self.t0) / self.duration;
+    pub fn feed(&mut self, x: usize, y: usize, t: f64){
+        let mut tmp:f64 = (t - 0.5 * self.dt - self.t0) / self.duration;
         tmp = tmp.powi(2);
         let iz = (-tmp).exp();
         //let iz = (-((t - 0.5 * self.dt - self.t0) / self.duration).powf(2.0)).exp();
@@ -507,5 +506,18 @@ impl fdtd {
             }
         }
         write!(*file,"Observation point: {}\r\n",self.ez[xo][yo]);
+    }
+
+    pub fn out_file_gnu(&self, file: &mut File) {
+        for y in LPML as usize..(self.ny - LPML) as usize {
+            for x in LPML as usize.. (self.nx - LPML) as usize {
+                if x % 50 == 0 && y % 50 == 0 {
+                    write!(*file, "{} {} {}\r\n", (x-LPML as usize) as f64 * DX, (y-LPML as usize) as f64 * DY, self.ez[x][y]);
+                }
+            }
+            if y % 50 == 0 {
+                write!(*file, "\r\n");
+            }
+        }
     }
 }
